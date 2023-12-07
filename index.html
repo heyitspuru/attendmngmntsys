@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Attendance Management System</title>
+    <!-- Styling for the client UI -->
+    <style>
+        h1 {
+            color: #FFFFFF;
+            font-family: system-ui;
+            margin-left: 20px;
+        }
+
+        body {
+            background-color: #222629;
+        }
+
+        label {
+            color: #86C232;
+            font-family: system-ui;
+            font-size: 20px;
+            margin-left: 20px;
+            margin-top: 20px;
+        }
+
+        button {
+            background-color: #86C232;
+            border-color: #86C232;
+            color: #FFFFFF;
+            font-family: system-ui;
+            font-size: 20px;
+            font-weight: bold;
+            margin-left: 30px;
+            margin-top: 20px;
+            width: 140px;
+        }
+
+        input {
+            color: #222629;
+            font-family: system-ui;
+            font-size: 20px;
+            margin-left: 10px;
+            margin-top: 20px;
+            width: 200px;
+        }
+    </style>
+    <script>
+        // callAPI function that takes the username, password, student details, and attendance status as parameters
+        var callAPI = (username, password, studentName, rollNumber, date, attendanceStatus) => {
+            // instantiate a headers object
+            var myHeaders = new Headers();
+            // add content type header to object
+            myHeaders.append("Content-Type", "application/json");
+            // using built-in JSON utility package, turn object to string and store in a variable
+            var raw = JSON.stringify({
+                "username": username,
+                "password": password,
+                "student_name": studentName,
+                "roll_number": rollNumber,
+                "date": date,
+                "attendance_status": attendanceStatus
+            });
+            // create a JSON object with parameters for API call and store in a variable
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: raw,
+                redirect: 'follow'
+            };
+            // make API call with parameters and use promises to get response
+            fetch("https://plpuj2xt20.execute-api.us-east-1.amazonaws.com/dev", requestOptions)
+                .then(response => response.text())
+                .then(result => alert(JSON.parse(result).body))
+                .catch(error => console.log('error', error));
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Attendance Management System</h1>
+    <form>
+        <label>Teacher Username:</label>
+        <input type="text" id="username">
+        <label>Password:</label>
+        <input type="password" id="password">
+        <br>
+        <label>Student Name:</label>
+        <input type="text" id="studentName">
+        <label>Roll Number:</label>
+        <input type="text" id="rollNumber">
+        <br>
+        <label>Date:</label>
+        <input type="text" id="date">
+        <label>Attendance Status:</label>
+        <input type="text" id="attendanceStatus">
+        <!-- set button onClick method to call function we defined passing input values as parameters -->
+        <button type="button" onclick="callAPI(
+            document.getElementById('username').value,
+            document.getElementById('password').value,
+            document.getElementById('studentName').value,
+            document.getElementById('rollNumber').value,
+            document.getElementById('date').value,
+            document.getElementById('attendanceStatus').value
+            )">RECORD ATTENDANCE</button>
+    </form>
+</body>
+
+</html>

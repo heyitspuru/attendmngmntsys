@@ -1,0 +1,53 @@
+import json
+import boto3
+
+dynamodb = boto3.resource('dynamodb')
+table_name = 'AttendanceTable'  
+table = dynamodb.Table(table_name)
+
+# hardcoded teacher credentials for simplicity (replace with a more secure solution)
+teacher_username = 'teacher'
+teacher_password = 'password'
+
+def lambda_handler(event, context):
+    # Extract relevant information from the Lambda service's event object
+    username = event.get('username')
+    password = event.get('password')
+    student_name = event.get('student_name')
+    roll_number = event.get('roll_number')
+    date = event.get('date')
+    attendance_status = event.get('attendance_status')
+
+    # Authentication check for teacher
+    if username != teacher_username or password != teacher_password:
+        return {
+            'statusCode': 401,
+            'body': json.dumps('Unauthorized: Invalid teacher credentials')
+        }
+
+    # Validation of required fields
+    if not student_name or not roll_number or not date or not attendance_status:
+        return {
+            'statusCode': 400,
+            'body': json.dumps('Missing required fields')
+        }
+
+    # Update attendance in DynamoDB
+    try:
+        response = table.put_item(
+            Item={
+                'RollNumber': roll_number,
+                'Date': date,
+                'StudentName': student_name,
+                'AttendanceStatus': attendance_status
+            }
+        )
+        return {
+            'statusCode': 200,
+            'body': json.dumps('Attendance recorded successfully')
+        }
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': json.dumps(f'Error recording attendance: {str(e)}')
+        }
